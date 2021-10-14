@@ -14,17 +14,14 @@ import { HardSkill} from './information/entity/HardSkill.entity'
 
 @Module({
   imports: [
-    /*TypeOrmModule.forRoot({
-      /*type: 'mongodb',
-      host: 'localhost',
-      database: 'test2',
-      port: 27017,
-      //url: 'mongodb+srv://backend:VQfKYfFePGMdMSdd@cluster0.39z7o.mongodb.net/nisitfolio',
-      //autoLoadEntities: true,
+    TypeOrmModule.forRoot({
+      type: 'mongodb',
+      url: process.env.MONGODB_URI,
+      autoLoadEntities: true,
       entities: [JobTitle,Skill,HardSkill],
       useUnifiedTopology: true,
     }),
-  InformationModule*/],
+  InformationModule],
   controllers: [AppController],
   providers: [AppService],
 })
