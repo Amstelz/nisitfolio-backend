@@ -14,8 +14,8 @@ import { HardSkill} from './information/entity/HardSkill.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mongodb',
+    /*TypeOrmModule.forRoot({
+      /*type: 'mongodb',
       host: 'localhost',
       database: 'test2',
       port: 27017,
@@ -24,7 +24,7 @@ import { HardSkill} from './information/entity/HardSkill.entity'
       entities: [JobTitle,Skill,HardSkill],
       useUnifiedTopology: true,
     }),
-    InformationModule],
+  InformationModule*/],
   controllers: [AppController],
   providers: [AppService],
 })
