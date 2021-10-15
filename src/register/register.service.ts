@@ -6,7 +6,7 @@ import { ObjectID } from 'mongodb';
 
 import { Account, Userinfo, AdditionalSkill, Certificate, EducationHistory, InterestedJob, WorkHistory,Portfolio,PortfolioPicture,Resume,UserJobSkill} from './entity/Register.entity'
 import { CreateRegisDto } from './dto/create-register.dto';
-import { EmailConfirmationService } from '../emailConfirmation/emailConfirmation.service';
+import { EmailConfirmationService } from '../emailconfirmation/emailConfirmation.service';
 import { Resume2 , ResumeDocument} from '../myresume/entity/myresume.schema';
 import { Portfolio2, PortfolioDocument} from '../portfolio/entity/portfolio.schema';
 

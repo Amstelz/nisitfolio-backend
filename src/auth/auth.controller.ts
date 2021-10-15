@@ -2,7 +2,7 @@ import {Body,Controller,Post,ClassSerializerInterceptor,UseInterceptors,} from '
 import { AuthService } from './auth.service'
 import { CreateRegisDto } from '../register/dto/create-register.dto';
 import { UsersService } from '../users/users.service';
-import { EmailConfirmationService } from '../emailConfirmation/emailConfirmation.service';
+import { EmailConfirmationService } from '../emailconfirmation/emailConfirmation.service';
 import { RegisterService } from '../register/register.service';
    
 @Controller('authentication')
