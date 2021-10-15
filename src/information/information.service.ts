@@ -15,7 +15,7 @@ export class InformationService {
     @InjectRepository(Skill)
     private SkillRepository: Repository<Skill>,
     @InjectRepository(HardSkill)
-    private HardSkillRepository: Repository<Skill>,
+    private HardSkillRepository: Repository<HardSkill>,
 
   ) {}
 
