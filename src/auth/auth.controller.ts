@@ -17,11 +17,10 @@ constructor(
    
 @Post('register')
 async register(@Body() registrationData: CreateRegisDto) {
-    //const user = await this.authenticationService.register(registrationData);
+   
     const user = await this.registerService.createRegis(registrationData)
     await this.emailConfirmationService.sendVerificationLink(registrationData.Email);
     return user;
 }
     
-// ...
 }

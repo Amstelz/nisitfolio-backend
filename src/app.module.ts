@@ -1,8 +1,13 @@
 //------------------Module----------------------------//
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 //-----------------AppModule--------------------------//
 import { InformationModule } from './information/information.module';
+import { RegisterModule } from './register/register.module';
+import { AuthModule } from './auth/auth.module';
+import { EmailConfirmationModule } from './emailconfirmation/emailConfirmation.module';
+import { UsersModule } from './users/users.module';
 //-----------------Controller-------------------------//
 import { AppController } from './app.controller';
 //-----------------Service---------------------------//
@@ -21,7 +26,16 @@ import { HardSkill} from './information/entity/HardSkill.entity'
       entities: [JobTitle,Skill,HardSkill],
       useUnifiedTopology: true,
     }),
-  InformationModule],
+    MongooseModule.forRoot(
+      process.env.MONGODB_URI_2
+      ),
+  InformationModule,
+  RegisterModule,
+  AuthModule,
+  EmailConfirmationModule,
+  UsersModule,
+
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
