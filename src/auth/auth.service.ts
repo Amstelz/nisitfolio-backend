@@ -9,7 +9,6 @@ import { Md5 } from 'ts-md5/dist/md5';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(UserReq )
     private usersService: UsersService,
     private jwtService: JwtService
   ) {}
