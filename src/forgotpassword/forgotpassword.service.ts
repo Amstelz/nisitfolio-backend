@@ -22,7 +22,7 @@ export class ForgotPasswordService {
       expiresIn: `${process.env.JWT_FORGOT_TOKEN_EXPIRATION_TIME}s` 
     });
  
-    const url = `${process.env.Forgot_PASSWORD_URL}?token=${token}`;
+    const url = `${process.env.Forgot_PASSWORD_URL}/token=${token}`;
     
     const text = `กรุณาคลิ๊กที่ลิ้งค์ด้านล่างเพื่อ reset password ของคุณ \n ${url}`;
  
