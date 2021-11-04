@@ -4,6 +4,7 @@ import { AuthService } from './auth/auth.service';
 import { UsersService } from './users/users.service';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { RealIP } from 'nestjs-real-ip';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Controller()
 export class AppController {
@@ -25,10 +26,15 @@ export class AppController {
     return this.authService.login(req.user,ip);
   }
 
-  @Get('kuay/:email')
+  @Get('valid/:email')
   async findemail(@Param('email') email: string)
   {
     return this.usersService.findOne(email);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user.userId;
+  }
 }

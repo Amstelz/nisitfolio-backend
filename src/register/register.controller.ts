@@ -141,31 +141,14 @@ export class RegisterController {
   async GetInfo(@Request() req) {
     return this.registerService.GetInfo(req.user.userId);
   }
-  //*/-----------------test
+
+
   @Delete("interestedJob/test/:id")
   async DeleteInterestedJob2(@Body() CreateDto: PatchRegisDto) {
 
-  //async DeleteInterestedJob2(@Request() req,@Param('id') id: string) {
     return this.registerService.NewinterestedJob(CreateDto,"617e5749f7a03441e0fadd99","xtest");
-    return this.registerService.DeleteInterestedJob("61797211e40d554a302c3ac2","61797216e40d554a302c3ace");
   }
 
 
-  /*@Get('/random')
-  //@Header('Content-Type', 'image/jpeg')
-  async RandomRegis()
-  {
-    const respone = await this.httpService.get('https://hilight.kapook.com/img_cms2/user/juthamat/jutha03/3_28.jpg').toPromise();
-    //console.log(Buffer.from(respone.data, 'binary').toString('base64',))
-    // console.log(respone.headers)
-    //console.log(respone.config)
-    return Buffer.from(respone.data, 'binary').toString('base64');
-    //return respone.data;
-
-    //console.log(respone.data)
-    //const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
-    //console.log(encode(respone.data));
-    //return encode(respone.data).slice(0, 20);
-    
-  }*/
+  
 }
