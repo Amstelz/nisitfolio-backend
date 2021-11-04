@@ -25,9 +25,10 @@ export class AppController {
     return this.authService.login(req.user,ip);
   }
 
-  @Get('valid/:email')
+  @Get('kuay/:email')
   async findemail(@Param('email') email: string)
   {
     return this.usersService.findOne(email);
   }
+
 }

@@ -3,6 +3,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { MyResumeService } from "./myresume.service";
 import { CreateResumeDto } from './dto/myresume.dto';
 import { RealIP } from 'nestjs-real-ip';
+import { CreatePortDto } from './dto/get_port2.dto';
 
 
 @Controller("myresume")
@@ -10,7 +11,12 @@ export class MyResumeController {
   constructor(
     private readonly resumeService: MyResumeService,
   ) {}
-
+  @UseGuards(JwtAuthGuard)
+  @Get("/myresume/foredit")
+    async GetResume3(@Request() req) {
+      return this.resumeService.GetResume3(req.user.userId);
+  
+    }
 
   @Get(':resumeId')
   async getResume(@Param('resumeId') resumeId: string){
@@ -27,7 +33,6 @@ export class MyResumeController {
     async Getheader(@Param('x') x: string,@Request() req) {
       return this.resumeService.getResumeheader(req.user.userId);
   }
-  
   
 
   @UseGuards(JwtAuthGuard)
@@ -56,9 +61,26 @@ export class MyResumeController {
       return this.resumeService.updateResume(CreateDto,resumeId,req.user.userId,ip);
 
     }
+  
+  @Get('/portfolio/:userid/owner')
+  async getportowner(@Param('userid') userId: string){
+    return this.resumeService.getportowner(userId);
+  }
 
-  /*@Post("makeresume")
-    async makeResume(@Body() CreateDto: CreateResumeDto ){
-      return this.resumeService.makeResume(CreateDto);
-    }*/
+  @Get('/portfolio/:userid/other')
+  async getportother(@Param('userid') userId: string){
+    return this.resumeService.getportother(userId);
+  }
+
+  @Get('/portfolio/:userid/guest')
+  async getportguest(@Param('userid') userId: string){
+    return this.resumeService.getportguest(userId);
+  }
+
+
+  @Patch('/testP/:resumeId')
+  async testcocP(@Body() CreateDto: CreateResumeDto,@Param('resumeId') resumeId: string){
+    return this.resumeService.updateResume(CreateDto,resumeId,"61738f2efd31c94ab4270b69","xtest");
+  }
+
 }

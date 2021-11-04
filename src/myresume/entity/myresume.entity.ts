@@ -76,6 +76,9 @@ export class Userinfo {
   create_time:string;
 
   @Column()
+  ProfilePic:string;
+
+  @Column()
   last_modified:string[];
 
 }
@@ -91,6 +94,9 @@ export class AdditionalSkill {
 
   @Column()
   UserId: string;
+
+  @Column()
+  Type: string;
 
   @Column()
   AdditionalSkill: string;
@@ -164,7 +170,7 @@ export class EducationHistory {
   Academy: string;
   
   @Column()
-  Grade: Float32Array;
+  Grade: string;
    
   @Column()
   Education_End_Year: number;   
@@ -236,7 +242,7 @@ export class WorkHistory {
 @Entity("InterestedJob")
 export class InterestedJob {
   @ObjectIdColumn()
-  id?: ObjectId;
+  _id?: ObjectId;
   
   @Column()
   ResumeId: string[];
@@ -282,11 +288,27 @@ export class Portfolio {
   @Column()
   Port_Privacy: string;
 
+  @Column()
+  Port_Name: string;
+  
+  @Column()
+  Port_Info: string;
+
+  @Column()
+  Port_Date: string;
+
+
   @OneToMany(type => PortfolioPicture, portfolioPicture => portfolioPicture.portfolio)
   portfolioPictures: PortfolioPicture[];
 
   @ManyToOne(type => Resume, resume => resume.portfolios)
   resumes: Resume[];
+
+  @Column()
+  ResumeId: string[];
+
+
+
 }
 
 //--------------------PortfolioPicture--------------------------//
@@ -331,7 +353,7 @@ export class Resume {
   Owner: string;
 
   @Column()
-  Aboutme: string;
+  AboutMe: string;
 
   @Column()
   Email: string;
@@ -374,6 +396,10 @@ export class Resume {
 
   @Column()
   modified_by:string[];
+
+  @Column()
+  ProfilePic_URL: string;
+
 
 
 }

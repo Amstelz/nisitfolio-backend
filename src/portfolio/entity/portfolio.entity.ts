@@ -270,13 +270,15 @@ export class Portfolio {
   @Column()
   ProfilePic: string;
 
+  @Column()
+  ResumeId:string[];
 }
 
 //--------------------PortfolioPicture--------------------------//
 @Entity("PortfolioPicture")
 export class PortfolioPicture {
   @ObjectIdColumn()
-  id?: ObjectId;
+  _id?: ObjectId;
   
   @ObjectIdColumn()
   PortId: ObjectId;
@@ -296,7 +298,10 @@ export class PortfolioPicture {
   @Column()
   last_modified:string[];
 
+
 }
+
+
 
 
 

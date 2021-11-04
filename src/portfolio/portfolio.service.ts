@@ -1,15 +1,17 @@
-import { Injectable, HttpException , HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException , HttpStatus, ConsoleLogger } from '@nestjs/common';
 import { CreatePortfolioDto } from './dto/portfolio.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SimpleConsoleLogger } from 'typeorm';
-import { Account, Userinfo, AdditionalSkill, Certificate, EducationHistory, InterestedJob, WorkHistory,Portfolio,PortfolioPicture} from './entity/portfolio.entity'
+import { Account, Userinfo,AdditionalSkill, Certificate, EducationHistory, InterestedJob, WorkHistory,Portfolio,PortfolioPicture} from './entity/portfolio.entity'
+import { Resume } from '../register/entity/Register.entity';
 import { ObjectID } from 'mongodb';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Portfolio2, PortfolioDocument} from './entity/portfolio.schema';
 //import { Portfolio3} from './dto/portfoli4';
-
-
+import { Resume2 , ResumeDocument} from '../myresume/entity/myresume.schema';
+import { UserInfoDocument, UserInfoMongoose } from 'src/register/entity/register.schema';
+import Portfolio3 from './dto/portfolio4.dto';
 import { hearderDto } from 'src/portfolio/dto/haerder.dto';
 import { Bookmark } from './entity/portfliobookmark.entity';
 
@@ -28,6 +30,8 @@ export class PortService {
     private accountRepository: Repository<Account>,
     @InjectRepository(Bookmark)
     private BookmarkRepository: Repository<Bookmark>,
+    @InjectModel(Resume2.name) 
+    private resumeModel: Model<ResumeDocument>,
     
 
 
@@ -98,6 +102,7 @@ export class PortService {
     port.UserId = CreateDto.UserId;
     port.Port_Name = CreateDto.Port_Name;
     port.Port_Info = CreateDto.Port_Info;
+    port.ResumeId = new Array();
     port.Owner = user.Firstname + " " + user.Lastname;
     port.totalBookmark = 0;
     port.Port_Tag = CreateDto.Port_Tag;
@@ -113,12 +118,14 @@ export class PortService {
     port.create_time = isoTime;
     port.last_modified = [isoTime];
     port.modified_by = [ip];
+    
 
     const portid = (await this.portRepository.save(port))._id;
     portpic.PortId = portid;
 
     portpic.last_modified =  [isoTime];
     portpic.create_time = isoTime;
+    
 
     return await this.portfolioPictureRepository.save(portpic);
   }
@@ -126,13 +133,35 @@ export class PortService {
   async removePort(portId:string, userId:string){
     const portid = new ObjectID(portId);
     const port =  await this.portRepository.findOne({where:{ _id: portid }});
-    const thatbookmark = await this.BookmarkRepository.find({where:{ id: portid }});
-    for (var _i = 0; _i < thatbookmark.length; _i++) {
-      await this.BookmarkRepository.remove(thatbookmark[_i]);
-    }
-    
     if (port && port.UserId === userId) {
+      const thatbookmark = await this.BookmarkRepository.find({where:{ id: portid }});
+      for (var _i = 0; _i < thatbookmark.length; _i++) {
+        await this.BookmarkRepository.remove(thatbookmark[_i]);
+      }
+      
+      const time =  new Date();
+      const isoTime = time.toLocaleDateString('th-TH',{ year:'numeric',month: 'long',day:'numeric',hour:"2-digit",minute:"2-digit"});
+      const ID = new ObjectID(portId);
       const portpic =  await this.portfolioPictureRepository.findOne({where:{ PortId: port._id }});
+
+      for (var _i = 0; _i < port.ResumeId.length; _i++) {
+        const resume =  await this.resumeModel.findOne({_id: port.ResumeId[_i] });
+        let copy = JSON.parse(JSON.stringify(resume));
+        await this.resumeModel.remove(resume);
+        var move = false;
+        for (var _j = 0; _j < copy.portfolios.length-1; _j++) {
+          if (copy.portfolios[_j]._id == portId || move == true || copy.portfolios[_j]._id == ID) 
+          {
+            move = true;
+            copy.portfolios[_j] = copy.portfolios[_j+1];
+          }
+        }
+        copy.portfolios.pop();
+        copy.last_modified.push(isoTime);
+        copy.modified_by.push("automatic system");
+        await this.resumeModel.create(copy);
+      }
+
       await this.portfolioPictureRepository.remove(portpic);
       return await this.portRepository.remove(port);
     }
@@ -146,21 +175,28 @@ export class PortService {
   async updatePort(CreateDto: CreatePortfolioDto,portId:string, userId:string){
     const portid = new ObjectID(portId);
     const port =  await this.portModel.findById(portid);
-    const portpic =  await this.portfolioPictureRepository.findOne({where:{ PortId: portid }});
-    
-    const time =  new Date();
-    const isoTime = time.toLocaleDateString('th-TH',{ year:'numeric',month: 'long',day:'numeric',hour:"2-digit",minute:"2-digit"});
-    const portfoliopic = new PortfolioPicture();
-    portfoliopic.create_time=portpic.create_time;
-    portfoliopic.last_modified=portpic.last_modified;
-    portfoliopic.PortId=portpic.PortId;
-    portfoliopic.last_modified.push(isoTime)
-
-    await this.portfolioPictureRepository.remove(portpic);
-    portfoliopic.PortId = portid;
-    
-    var portpic_arr = [];
     if (port && port.UserId === userId) {
+      const portpic =  await this.portfolioPictureRepository.findOne({where:{ PortId: portid }});
+      const time =  new Date();
+      const isoTime = time.toLocaleDateString('th-TH',{ year:'numeric',month: 'long',day:'numeric',hour:"2-digit",minute:"2-digit"});
+      const portfoliopic = new PortfolioPicture();
+      const subportfoliopic = new PortfolioPicture();
+      portfoliopic._id = portpic._id;
+      subportfoliopic._id =  portpic._id;
+      portfoliopic.create_time=portpic.create_time;
+      portfoliopic.last_modified=portpic.last_modified;
+      portfoliopic.PortId=portpic.PortId;
+      portfoliopic.last_modified.push(isoTime)
+      portfoliopic.Pic = portpic.Pic;
+      portfoliopic.Description = portpic.Description;
+      
+      const ID = new ObjectID(portId);
+
+      await this.portfolioPictureRepository.remove(portpic);
+      portfoliopic.PortId = portid;
+      
+      var portpic_arr = [];
+      
       if (CreateDto.Port_Tag != null)
         port.Port_Tag = CreateDto.Port_Tag;
       if (CreateDto.Port_Privacy != null)
@@ -177,11 +213,39 @@ export class PortService {
         portfoliopic.Pic = CreateDto.Pic;
       if (CreateDto.Description != null)
         portfoliopic.Description =  CreateDto.Description;
-      portpic_arr.push(portfoliopic)
+
+      subportfoliopic.Pic = portfoliopic.Pic;
+      subportfoliopic.Description = portfoliopic.Description;
+      portpic_arr.push(subportfoliopic)
       port.portfolioPictures = portpic_arr;
+
+      for (var _i = 0; _i < port.ResumeId.length; _i++) {
+        const resume =  await this.resumeModel.findOne({_id: port.ResumeId[_i] });
+        let copy = JSON.parse(JSON.stringify(resume));
+        await this.resumeModel.remove(resume);
+        for (var _j = 0; _j < copy.portfolios.length; _j++) {
+          if (copy.portfolios[_j].id == ID || copy.portfolios[_j].id == portId )
+          {
+            copy.portfolios[_j].Port_Tag = port.Port_Tag;
+            copy.portfolios[_j].Port_Privacy = port.Port_Privacy;
+            copy.portfolios[_j].Port_Name = port.Port_Name
+            copy.portfolios[_j].Port_Info= port.Port_Info
+            copy.portfolios[_j].Port_Date = port.Port_Date
+            copy.portfolios[_j].portfolioPictures = port.portfolioPictures
+          }
+        }
+        copy.last_modified.push(isoTime);
+        copy.modified_by.push("automatic system");
+        await this.resumeModel.create(copy);
+      }
+
       await this.portfolioPictureRepository.save(portfoliopic);
       return await this.portModel.create(port);
     }
+    throw new HttpException({
+      status: HttpStatus.UNAUTHORIZED,
+      error: 'Can not Update Other Data',
+    }, HttpStatus.UNAUTHORIZED);
   }
   async updatePortP(CreateDto: CreatePortfolioDto,portId:string, userId:string){
     const portid = new ObjectID(portId);
@@ -213,6 +277,7 @@ export class PortService {
       return await this.portModel.create(port);
     }
   }
+
   async sortport(userId:string, sort:string){
     const arr_user_port=await this.portModel.find({UserId : userId});
     const arr_sort=[];
@@ -235,28 +300,47 @@ export class PortService {
     if(sort=="createTime"){
       for (var _i = 0; _i < arr_user_port.length; _i++) {
         const user_port=arr_user_port[_i].create_time
-        if (user_port==null){
-          continue;
-        }
+
         const y=user_port.split(' ');
         const t=y[3].split(':');
         const tmp=Number(y[0])*10000+Datess[y[1]]*1000000+Number(y[2])*100000000+Number(t[0])*100+Number(t[1]);
+        //return "f"
 
-        arr_sort.push(tmp);
-        arr_dic[tmp]=_i;
+        if(arr_dic[tmp]==null){
+          arr_sort.push(tmp);
+          arr_dic[tmp]=_i;
+        }else{
+          arr_sort.push(tmp+1/10);
+          arr_dic[tmp+1/10]=_i;
+        }
       }
     }else if(sort=="ascendingOrder"||sort=="descendingOrder"){
       for (var _i = 0; _i < arr_user_port.length; _i++) {
         const user_port=arr_user_port[_i].Port_Date
-        if (user_port==null){
-          continue;
-        }
         const y=user_port.split('/').map(Number);
-        const tmp=y[0]+y[1]*100+y[2]*10000;
-        arr_sort.push(tmp);
-        arr_dic[tmp]=_i;
+        const dum=new String(y[2])
+        const tmp2=Number(dum[0]+dum[2]+dum[3])
+        y[2]=Number(tmp2)
+        //return y[2]
+        //return [tmp2,dum,y[2]]
+        //const tmp=y[0]+y[1]*100+y[2]*10000;
+
+        const user_port2=arr_user_port[_i].create_time
+
+        const y2=user_port2.split(' ');
+        const t2=y2[3].split(':');
+        const tmp=y[0]+y[1]*100+y[2]*10000+Number(y2[0])/10000+Datess[y2[1]]/100+Number(t2[0])/1000000+Number(t2[1])/100000000+1/1000000000;
+
+        if(arr_dic[tmp]==null){
+          arr_sort.push(tmp);
+          arr_dic[tmp]=_i;
+        }else{
+          arr_sort.push(tmp+1/1000000000);
+          arr_dic[tmp+1/1000000000]=_i;
+        }
       }
     }
+    
 
 
     arr_sort.sort();
@@ -264,13 +348,26 @@ export class PortService {
       arr_sort.reverse()
     }
 
+
     for (var _i = 0; _i < arr_user_port.length; _i++) {
       const key= arr_dic[arr_sort[_i]]
       resut.push(arr_user_port[key])
     }
+    //return [resut,arr_dic]
     return resut;
 
   }
 
+  async getportowner(userId:string ){
+    return  this.portModel.find({UserId : userId});
+  }
+
+  async getportother(userId:string ){
+    return  this.portModel.find({$and: [ {UserId : userId }, { $or: [ {Port_Privacy : "Public"} , {Port_Privacy : "Members"} ] } ]});
+  }
+
+  async getportguest(userId:string ){
+    return  this.portModel.find({$and: [ {UserId : userId }, { Port_Privacy : "Public" } ] });
+  }
 
 }

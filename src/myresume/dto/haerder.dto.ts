@@ -2,8 +2,6 @@ import { IsEmail, IsNotEmpty, IsNumberString } from 'class-validator';
 
 export class hearderDto {
 
-
-
     Email: string;
   
     ProfilePic: string;

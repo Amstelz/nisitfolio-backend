@@ -12,6 +12,7 @@ export class PortController {
     private readonly portService: PortService,
   ) {}
 
+
   @Get(':portfolioId')
   async getPort(@Param('portfolioId') portfolioId: string){
     return this.portService.getPort(portfolioId);
@@ -68,10 +69,23 @@ export class PortController {
     }
   @UseGuards(JwtAuthGuard)
   @Get('/sort/:sort')
-  //async getThisUserBookmarks(@Param('id') userId: string,@Param('sort') sort: string): Promise<any[]> {
   async sortportUser(@Request() req,@Param('sort') sort: string){
       return this.portService.sortport(req.user.userId, sort);
     }
   
-    
+  @Get(':userid/owner')
+  async getportowner(@Param('userid') userId: string){
+    return this.portService.getportowner(userId);
+  }
+
+  @Get(':userid/other')
+  async getportother(@Param('userid') userId: string){
+    return this.portService.getportother(userId);
+  }
+
+  @Get(':userid/guest')
+  async getportguest(@Param('userid') userId: string){
+    return this.portService.getportguest(userId);
+  }
+
 }

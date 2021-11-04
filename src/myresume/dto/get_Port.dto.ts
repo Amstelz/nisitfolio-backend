@@ -15,7 +15,7 @@ export class GetResume {
 
   Owner: string;
 
-  Aboutme: string;
+  AboutMe: string;
 
   Email: string;
 
@@ -50,5 +50,7 @@ export class GetResume {
   Country:string;
 
   City:string;
+
+  ProfilePic_URL:string;
 
 }

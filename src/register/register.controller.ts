@@ -1,18 +1,21 @@
 import { Controller, Get, Post, Body, Param, Request, Patch, UseGuards, Delete, Header, Res } from '@nestjs/common';
 
+import { HttpService } from '@nestjs/axios';
 import { RegisterService } from './register.service';
 import { CreateRegisDto } from './dto/create-register.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PatchRegisDto } from './dto/patch-register.dto';
 
+import { RealIP } from 'nestjs-real-ip';
+
 
 @Controller('register')
 export class RegisterController {
-  constructor(private registerService: RegisterService) {}
+  constructor(private registerService: RegisterService,private httpService: HttpService,) {}
 
   @Post()
-  async CreateRegister(@Body() CreateDto: CreateRegisDto ) {
-    return this.registerService.createRegis(CreateDto);
+  async CreateRegister(@Body() CreateDto: CreateRegisDto,@RealIP() ip: string) {
+    return this.registerService.createRegis(CreateDto,ip);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -22,9 +25,54 @@ export class RegisterController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post("/addsoftskill")
+  async Addsoftskill(@Body() CreateDto: PatchRegisDto ,@Request() req) {
+    return this.registerService.Newaddskill(CreateDto,req.user.userId);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Post("/addcertificate")
+  async Addcertificate(@Body() CreateDto: PatchRegisDto ,@Request() req) {
+    return this.registerService.Newcertificate(CreateDto,req.user.userId);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Post("/addeducationHistory")
+  async AddeducationHistory(@Body() CreateDto: PatchRegisDto ,@Request() req) {
+    return this.registerService.NeweducationHistory(CreateDto,req.user.userId);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Post("/addworkHistory")
+  async AddworkHistory(@Body() CreateDto: PatchRegisDto ,@Request() req) {
+    return this.registerService.NewworkHistory(CreateDto,req.user.userId);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Post("/addinterestedJob")
+  async AddinterestedJob(@Body() CreateDto: PatchRegisDto ,@Request() req,@RealIP() ip: string) {
+    return this.registerService.NewinterestedJob(CreateDto,req.user.userId,ip);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete()
   async DeleteRegister(@Request() req) {
     return this.registerService.DeleteRegis(req.user.userId);
+  }
+
+
+  @Get('/jobtitle')
+  async findJobTitle()
+  {
+    return this.registerService.findJobTitle();
+  }
+
+  @Get(':jobtitle/skill')
+  async findSkill(@Param('jobtitle') jobtitle: string)
+  {
+    return this.registerService.findSkill(jobtitle);
+  }
+
+  @Get(':type/hardskill')
+  async findHardSkill(@Param('type') type: string)
+  {
+    return this.registerService.findHardSkill(type);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -87,10 +135,37 @@ export class RegisterController {
     return this.registerService.DeleteInterestedJob(req.user.userId,id);
   }
 
+  
   @UseGuards(JwtAuthGuard)
   @Get("getinfo")
   async GetInfo(@Request() req) {
     return this.registerService.GetInfo(req.user.userId);
   }
-  
+  //*/-----------------test
+  @Delete("interestedJob/test/:id")
+  async DeleteInterestedJob2(@Body() CreateDto: PatchRegisDto) {
+
+  //async DeleteInterestedJob2(@Request() req,@Param('id') id: string) {
+    return this.registerService.NewinterestedJob(CreateDto,"617e5749f7a03441e0fadd99","xtest");
+    return this.registerService.DeleteInterestedJob("61797211e40d554a302c3ac2","61797216e40d554a302c3ace");
+  }
+
+
+  /*@Get('/random')
+  //@Header('Content-Type', 'image/jpeg')
+  async RandomRegis()
+  {
+    const respone = await this.httpService.get('https://hilight.kapook.com/img_cms2/user/juthamat/jutha03/3_28.jpg').toPromise();
+    //console.log(Buffer.from(respone.data, 'binary').toString('base64',))
+    // console.log(respone.headers)
+    //console.log(respone.config)
+    return Buffer.from(respone.data, 'binary').toString('base64');
+    //return respone.data;
+
+    //console.log(respone.data)
+    //const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
+    //console.log(encode(respone.data));
+    //return encode(respone.data).slice(0, 20);
+    
+  }*/
 }

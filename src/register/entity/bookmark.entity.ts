@@ -1,13 +1,13 @@
-import { Entity, Column, ObjectIdColumn } from 'typeorm'; 
-import { ObjectId } from 'mongodb';
+import { Entity, Column, ObjectIdColumn, OneToMany, ManyToOne } from 'typeorm'; 
+import { ObjectId, Timestamp } from 'mongodb';
 
 @Entity("Bookmark")
 export class Bookmark {
 
-  @ObjectIdColumn()
-  _id?: ObjectId;
+    @ObjectIdColumn()
+    _id?: ObjectId;
 
-  @Column()
+    @Column()
   userId: String;
   
   @Column()
@@ -21,8 +21,11 @@ export class Bookmark {
 
   @Column()
   id: ObjectId;
-
-  @Column()
+/*
+  @Column({type: Object})
+  details: any;
+*/
+    @Column()
   details: any;
 
   @Column()

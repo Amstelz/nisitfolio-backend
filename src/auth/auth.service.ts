@@ -10,8 +10,6 @@ import { Md5 } from 'ts-md5/dist/md5';
 export class AuthService {
   constructor(
     @InjectRepository(UserReq )
-    private accountRepository: Repository<UserReq >,
-
     private usersService: UsersService,
     private jwtService: JwtService
   ) {}
