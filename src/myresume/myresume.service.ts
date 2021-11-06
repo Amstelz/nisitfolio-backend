@@ -434,7 +434,7 @@ export class MyResumeService {
         const old_Port = resume.portfolios;
         const old_Port_id_arr=[]
         for (var _i = 0; _i < old_Port.length; _i++) {
-          old_Port_id_arr.push(old_Port[_i]._id)
+          old_Port_id_arr.push(old_Port[_i].id)
         }
 
         for (var _i = 0; _i < CreateDto.PortID.length; _i++) {
@@ -463,7 +463,8 @@ export class MyResumeService {
 
         if(old_Port_id_arr.length!=0){
           for (var _i = 0; _i < old_Port_id_arr.length; _i++) {
-            const edit_Port=await this.portModel.findOne({where:{ _id: new ObjectID(old_Port_id_arr[_i]) }});
+            const objID = new ObjectID(old_Port_id_arr[_i]);
+            const edit_Port=await this.portModel.findOne({ _id: objID });
             const tmp=edit_Port.ResumeId.indexOf(resumeId)
             edit_Port.ResumeId.splice(tmp,1)
             await this.portModel.create(edit_Port);
@@ -551,6 +552,7 @@ export class MyResumeService {
     res_arr.push(res_arr2);
     res_arr.push(res_arr3);
     return res_arr;
+  
   }
 
   async getportother(userId:string ){
