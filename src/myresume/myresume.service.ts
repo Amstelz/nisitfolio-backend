@@ -434,7 +434,7 @@ export class MyResumeService {
         const old_Port = resume.portfolios;
         const old_Port_id_arr=[]
         for (var _i = 0; _i < old_Port.length; _i++) {
-          old_Port_id_arr.push(old_Port[_i].id)
+          old_Port_id_arr.push(old_Port[_i]._id)
         }
 
         for (var _i = 0; _i < CreateDto.PortID.length; _i++) {
@@ -447,7 +447,7 @@ export class MyResumeService {
           subportfolio.Port_Tag = portfolio.Port_Tag;
           subportfolio.Port_Info = portfolio.Port_Info;
           subportfolio.Port_Date = portfolio.Port_Date;
-          subportfolio.id  = portfolio.id;
+          subportfolio._id  = portfolio.id;
           subportfolio.portfolioPictures = [portpic];
           if ( portfolio.ResumeId.includes(resumeId) == false){
             portfolio.ResumeId.push(resumeId);
